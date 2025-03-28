@@ -1,0 +1,1456 @@
+---
+title: "SEC7001"
+author: '2312602'
+date: "2024-08-19"
+output:
+  word_document: 
+    toc: true
+    fig_caption: true
+    fig_height: 4
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.cap = "Figure: ")
+
+```
+
+## DAT7006 ASSESSMENT 2
+# 1. Business Understanding
+
+## Research Hypothesis
+
+
+Pacman library package loads pacman::p_load(pacman, dplyr, GGally, ggplot2, ggthemes, ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny, stringr, tidyr)
+
+Load library
+```{r}
+library(pacman)  # No message
+library(dplyr)
+```
+
+# 2. Data Understanding
+
+
+Load the dataset
+```{r}
+Metro  <- read.csv("C:/MetroPT3(AirCompressor).csv", header = TRUE)
+
+#DROP THE INDEX COLUMN X
+Metro <- Metro[, !names(Metro) %in% "X"] 
+
+View(Metro)
+```
+
+
+## 2.1 Descriptive Analysis
+
+
+### 2.2.1 Data Info
+Check number of columns.
+```{r}
+ncol(Metro)
+```
+
+Check number of rows.
+```{r}
+nrow(Metro)
+```
+
+Check the characters.
+```{r}
+str(Metro)
+```
+
+To change the timestamp column to its actual datetime character format, type.convert is used as shown below.
+```{r}
+library(lubridate)
+# Convert the character column to POSIXct (datetime format)
+Metro$timestamp <- ymd_hms(as.character(Metro$timestamp))
+```
+
+check the new character
+```{r}
+str(Metro)
+```
+
+### 2.2.2 Data summary
+```{r}
+summary(Metro)
+```
+
+## 2.2 EDA
+
+### 2.2.3 Metro Correlation Matrix
+```{r}
+# Correlation analysis
+correlation_matrix <- cor(Metro[, -c(1, 12)], use = "complete.obs")
+
+# Visualization of correlation matrix
+require(corrplot)
+
+# Set the size of the plot window
+corrplot(correlation_matrix, method = "color", type = "lower", 
+         addCoef.col = "black", tl.col = "black", tl.srt = 5)
+```
+
+### 2.2.4 Normalization check
+
+```{r}
+hist(Metro$TP2, main = "Distribution of TP2", xlab = "TP2")
+```
+```{r}
+hist(Metro$TP3, main = "Distribution of TP3", xlab = "TP3")
+```
+```{r}
+hist(Metro$H1, main = "Distribution of H1", xlab = "H1")
+```
+```{r}
+hist(Metro$DV_pressure, main = "Distribution of DV_Pressure", xlab = "DV_PRESSURE")
+```
+```{r}
+hist(Metro$Reservoirs, main = "Distribution of Reservoirs", xlab = "RESERVOIRS")
+```
+```{r}
+hist(Metro$Oil_temperature, main = "Distribution of Oil temperature", xlab = "OIL TEMPERATURE")
+```
+
+```{r}
+hist(Metro$Motor_current, main = "Distribution of MOTOR CURRENT", xlab = "MOTOR CURRENT")
+```
+
+```{r}
+hist(Metro$COMP, main = "Distribution of COMP", xlab = "COMP")
+```
+
+```{r}
+hist(Metro$DV_eletric, main = "Distribution of DV_PRESSURE", xlab = "DV_PRESSURE")
+```
+
+```{r}
+hist(Metro$Towers, main = "Distribution of TOWERS", xlab = "TOWERS")
+```
+
+```{r}
+hist(Metro$LPS, main = "Distribution of LPS", xlab = "LPS")
+```
+
+```{r}
+hist(Metro$Pressure_switch, main = "Distribution of PRESSURE SWITCH", xlab = "PRESSURE SWITCH")
+```
+
+```{r}
+hist(Metro$Oil_level, main = "Distribution of OIL LEVEL", xlab = "OIL LEVEL")
+```
+
+```{r}
+hist(Metro$Caudal_impulses, main = "Distribution of Caudal Impulses", xlab = "Caudal Impulses")
+```
+
+# 3. Data Preparation
+
+Data Pre-processing
+## 3.1 Missing Values
+
+code below shows prints number of missing values in the dataset. 
+```{r}
+Metro1 <- Metro #create a copy of dataset
+
+sum(is.na(Metro1))
+```
+
+code below displays the total number of missing values in each column as shown below.
+```{r}
+colSums(is.na(Metro1))
+```
+```{r}
+is.na(Metro1)
+```
+
+
+## 3.2 Outliers
+
+```{r}
+#Timestamp
+boxplot(Metro1$timestamp, main = "Timestamp Boxplot")
+```
+
+```{r}
+#TP2
+boxplot(Metro1$TP2, main = "TP2 Boxplot")
+```
+
+```{r}
+#TP3
+boxplot(Metro1$TP3, main = "TP3 Boxplot")
+```
+
+```{r}
+#DV_pressure
+boxplot(Metro1$DV_pressure, main = "DV_pressure Boxplot")
+```
+
+```{r}
+#Reservoirs
+boxplot(Metro1$Reservoirs, main = "Reservoirs Boxplot")
+```
+
+```{r}
+#Oil_temperature
+boxplot(Metro1$Oil_temperature, main = "Oil_temperature Boxplot")
+```
+
+```{r}
+#Motor_current
+boxplot(Metro1$Motor_current, main = "Motor_current Boxplot")
+```
+
+```{r}
+#COMP
+boxplot(Metro1$COMP, main = "COMP Boxplot")
+```
+
+```{r}
+#DV_eletric
+boxplot(Metro1$DV_eletric, main = "DV_eletric Boxplot")
+```
+
+```{r}
+#Towers
+boxplot(Metro1$Towers, main = "Towers Boxplot")
+```
+
+```{r}
+#MPG
+boxplot(Metro1$MPG, main = "MPG Boxplot")
+```
+
+```{r}
+#LPS
+boxplot(Metro1$LPS, main = "LPS Boxplot")
+```
+
+```{r}
+#Pressure_switch
+boxplot(Metro1$Pressure_switch, main = "Pressure_switch Boxplot")
+```
+
+```{r}
+#Oil_level
+boxplot(Metro1$Oil_level, main = "Oil_level Boxplot")
+```
+
+```{r}
+#Caudal_impulses
+boxplot(Metro1$Caudal_impulses, main = "Caudal_impulses Boxplot")
+```
+
+```{r}
+library(Hmisc)
+```
+
+
+## 3.3 Feature Engineering
+
+```{r}
+# Define the failure ranges of indices
+range1 <- 562565:571227    # First range (4/18/2020 0:00	   4/18/2020 23:59)
+range2 <- 840741:843105    # Second range (5/29/2020 23:30     5/30/2020 6:00)
+range3 <- 887240:908125    # Third range (6/5/2020 10:00	   6/7/2020 14:30)
+range4 <- 1171094:1172715  # Fourth range (7/15/2020 14:30     7/15/2020 19:00)
+
+# Check if the dataset has enough rows to include the specified ranges
+if (max(c(range1, range2, range3, range4)) > nrow(Metro1)) {
+  stop("The specified index ranges exceed the number of rows in the dataset.")
+}
+
+# Add a new column that assigns 1 to the specified ranges and 0 to others
+Metro1$Aircompfail <- ifelse(
+  seq_len(nrow(Metro1)) %in% c(range1, range2, range3, range4), 1, 0)
+
+# View the rows where Aircompfail is 1 (for demonstration purposes)
+View(Metro1)
+head(Metro1)
+```
+
+Datacount for Aircompfail.
+```{r}
+table(Metro1$Aircompfail)
+```
+
+## 3.5 Hypothesis Testing:
+
+Q1. Is there a relationship between TP2 and DV_Pressure ?
+```{r}
+# Bivariate Analysis -Correlation coefficient 
+cor(Metro1$TP2, Metro1$DV_pressure, method = 'spearman')
+```
+
+Q2. Is there a relationship between MPG and Pressure Switch?
+```{r}
+# Correlation coefficient
+cor(Metro1$MPG, Metro1$Pressure_switch, method = 'spearman')
+```
+
+Q3. Is there a relationship between H1 and TP2
+```{r}
+# Correlation coefficient
+cor(Metro1$TP2, Metro1$H1, method = 'spearman')
+```
+
+Multivariate Analysis
+Q4. is there a relationship between TP2, DV_Pressure and Aircompfail?
+
+Multiple corellation
+```{r}
+#selected_data <- Sheffield[, c("TSK","RAINC", "SMOIS")]
+Mulcorrmatrix <- cor(Metro1[, c("TP2","DV_pressure", "Aircompfail")])
+Mulcorrmatrix
+```
+```{r}
+Mulcorrelation <- sqrt(det(Mulcorrmatrix))
+Mulcorrelation
+```
+
+
+## 3.6 Data Sampling
+
+Create a copy of dataset
+```{r}
+library(caTools)
+
+Metro2 <- Metro1 #create a copy of dataset for modelling
+
+str(Metro2)
+```
+
+Check the class distribution
+```{r}
+# Display the original class distribution
+print("Original class distribution:")
+print(table(Metro2$Aircompfail))
+```
+
+Hybrid-Sampling technique
+```{r}
+library(ROSE)
+
+# Create a balanced dataset
+Metro3 <- ovun.sample(Aircompfail ~ ., 
+                          data = Metro2, 
+                          method = "both",   # Use both over-sampling and under-sampling
+                          p = 0.5,           # Aim for a 50/50 class distribution
+                          seed = 1)$data     # Set seed for reproducibility
+
+# Display the class distribution after balancing
+print("Class distribution after balancing:")
+print(table(Metro3$Aircompfail))
+```
+Check column headers
+
+```{r}
+names(Metro3)
+```
+
+# Modelling - Dataframes
+```{r}
+# Create a copy of Metro3 and drop a timestamp column
+Metro4 <- Metro3[ , !(names(Metro3) %in% c("timestamp"))] #used on the entire dataset
+
+Metro5 <- Metro3[ , !(names(Metro3) %in% c("timestamp"))] #used to separate the dataset into two
+
+#Analog Sensor Data
+Analog <- Metro5[,c("Aircompfail", "TP2", "TP3", "H1", "DV_pressure", "Reservoirs", "Oil_temperature", "Motor_current")]
+
+#Digital Sensor Data
+Digital <- Metro5[,c("Aircompfail", "COMP", "DV_eletric", "Towers", "MPG", "LPS", "Pressure_switch", "Oil_level", "Caudal_impulses")]
+```
+
+# 4. MetroPT-3 Dataset
+## 4.1 Feature Selection
+```{r}
+library(corrplot)
+# Calculate the correlation matrix
+Metro4corrmatrix <- cor(Metro4[, -ncol(Metro4)])
+
+# Plot the correlation matrix
+corrplot(Metro4corrmatrix, method = "circle")
+```
+
+```{r}
+library(caret)
+# Find highly correlated features (correlation > 0.75)
+Metro4highlyCorrelated <- findCorrelation(Metro4corrmatrix, cutoff = 0.75)
+
+# Print the indices of highly correlated attributes
+print(Metro4highlyCorrelated)
+```
+
+```{r}
+# Remove highly correlated features
+Metro4 <- Metro4[, -Metro4highlyCorrelated]
+
+View(Metro4)
+```
+
+## 4.2 Train_Test_Split
+
+Split the dataframe using 80/20 split
+```{r}
+Metro4split <- sample.split(Metro4, SplitRatio = 0.8)
+```
+
+Initiate training set and testing set
+```{r}
+m4train <- Metro4[Metro4split,]
+m4test <- Metro4[!Metro4split,]
+```
+
+the data has been split using 80/20 split. 80% of the data goes to the training model and the 20% goes to test model.
+
+```{r}
+names(Metro4)
+```
+
+check for number of rows in each
+```{r}
+nrow(m4train)
+```
+
+```{r}
+nrow(m4test)
+```
+
+## 4.3 Modelling Techniques
+
+Import Deep Learning Libraries
+```{r}
+# Load necessary libraries
+library(caret) #
+library(e1071) #
+library(randomForest)
+library(gbm)
+library(xgboost)
+```
+
+### 4.3.1. Logistic Regression
+```{r}
+#Train the model
+Logmodel <- glm(Aircompfail~., data = m4train, family = "binomial")
+
+#Predict the model
+Logpredict <- predict(Logmodel, m4test, type = "response")
+Logpredict
+```
+
+#### Logistic Regression Evaluation
+```{r}
+# Convert probabilities to binary outcomes (assuming 0.5 as threshold)
+Logpredclass <- ifelse(Logpredict > 0.5, 1, 0)
+Logpredclass <- as.factor(Logpredclass)
+
+summary(Logpredclass)
+```
+
+```{r}
+# Ensure that the lengths of predclass and testdata match
+print(paste("Length of predicted classes: ", length(Logpredclass)))
+print(paste("Length of actual classes: ", length(m4test$Aircompfail)))
+
+M4lrcmatrix <- confusionMatrix(Logpredclass, (factor(m4test$Aircompfail)))
+M4lrcmatrix
+
+Logaccuracy <- M4lrcmatrix$overall['Accuracy']
+Logrecall <- M4lrcmatrix$byClass["Recall"]
+Logprecision <- M4lrcmatrix$byClass["Precision"]
+Logf1score <- M4lrcmatrix$byClass["F1"]
+
+Logaccuracy
+Logrecall
+Logprecision
+Logf1score
+```
+
+### 4.3.2. Decision Tree
+```{r}
+#import libraries
+library(rpart)
+library(rpart.plot)
+
+# Fit the decision tree model using the training data
+Dtmodel <- rpart(Aircompfail ~ ., data = m4train, method = "class")
+
+# Plot the decision tree
+rpart.plot(Dtmodel)
+```
+
+Predict the model
+```{r}
+# Predict class labels
+Dtpredict <- predict(Dtmodel, m4test, type = "class")  # Get class labels
+summary(Dtpredict)
+```
+
+#### Decision Tree Evaluation
+```{r}
+# Ensure that the lengths of predclass and testdata match
+print(paste("Length of predicted classes: ", length(Dtpredict)))
+print(paste("Length of actual classes: ", length(m4test$Aircompfail)))
+```
+
+Decision Tree Confusion  matrix
+```{r}
+#Evaluate model performance
+Dtconfmatrix <- confusionMatrix(factor(Dtpredict), factor(m4test$Aircompfail))
+Dtaccuracy <- Dtconfmatrix$overall['Accuracy']
+Dtrecall <- Dtconfmatrix$byClass["Recall"]
+Dtprecision <- Dtconfmatrix$byClass["Precision"]
+Dtf1score <- Dtconfmatrix$byClass["F1"]
+
+Dtconfmatrix
+Dtaccuracy
+Dtrecall
+Dtprecision
+Dtf1score
+```
+
+### 4.3.3. Random forest
+```{r}
+library(ranger) #for faster implementation
+
+# Train the Random Forest model
+Rfmodel <- ranger(Aircompfail ~ ., data = m4train, probability = TRUE)
+
+#predict on the test set
+Rfpredict <- predict(Rfmodel, m4test)$predictions
+summary(Rfpredict)
+```
+
+#### Random Forest Evaluation
+```{r}
+# Convert predictions and actual values to factors with the same levels
+Rfpredclass <- ifelse(Rfpredict[,2] > 0.5, "1", "0")
+
+
+print(paste("Length of predicted classes: ", length(Rfpredclass)))
+print(paste("Length of actual classes: ", length(m4test$Aircompfail)))
+
+# Generate the confusion matrix and calculate accuracy
+Rfconfmatrix <- confusionMatrix(as.factor(Rfpredclass), factor(m4test$Aircompfail))
+
+# Extract recall, precision, and F1 score
+Rfaccuracy <- Rfconfmatrix$overall['Accuracy']
+Rfrecall <- Rfconfmatrix$byClass["Recall"]
+Rfprecision <- Rfconfmatrix$byClass["Precision"]
+Rff1score <- Rfconfmatrix$byClass["F1"]
+
+# Print the metrics
+print(Rfconfmatrix)
+
+cat("Accuracy:", Rfaccuracy, "\n")
+cat("Recall:", Rfrecall, "\n")
+cat("Precision:", Rfprecision, "\n")
+cat("F1 Score:", Rff1score, "\n")
+```
+
+
+### 4.3.4. Gradient Boosting Machine
+```{r}
+# Load the gbm package
+library(gbm)
+
+# Train the GBM model
+Gbmmodel <- gbm(Aircompfail ~ ., data = m4train,
+                 distribution = "bernoulli", # For binary classification
+                 n.trees = 100,              # Number of trees
+                 interaction.depth = 3,      # Depth of each tree
+                 shrinkage = 0.01,            # Learning rate
+                 cv.folds = 5,               # Number of cross-validation folds
+                 verbose = TRUE)             # Print progress
+
+# Print the summary of the model to get information on the performance
+summary(Gbmmodel)
+str(Gbmmodel)
+
+# Determine the best number of trees using cross-validation results
+bestntrees <- gbm.perf(Gbmmodel, method = "cv")
+print(paste("Best number of trees:", bestntrees))
+```
+
+```{r}
+# Make predictions on the test set
+Gbmpredict <- predict(Gbmmodel, newdata = m4test, n.trees = bestntrees, type = "response")
+summary(Gbmpredict)
+```
+
+#### GBM Evaluate
+```{r}
+# Convert probabilities to class labels
+Gbmpredclass <- ifelse(Gbmpredict > 0.5, "1", "0")
+Gbmpredclass <- as.factor(Gbmpredclass)
+
+print(paste("Length of predicted classes: ", length(Gbmpredclass)))
+print(paste("Length of actual classes: ", length(m4test$Aircompfail)))
+
+# Create a confusion matrix
+Gbmconfmatrix <- confusionMatrix(Gbmpredclass, factor(m4test$Aircompfail))
+
+# Extract recall, precision, and F1 score
+Gbmaccuracy <- Gbmconfmatrix$overall['Accuracy']
+Gbmrecall <- Gbmconfmatrix$byClass["Recall"]
+Gbmprecision <- Gbmconfmatrix$byClass["Precision"]
+Gbmf1score <- Gbmconfmatrix$byClass["F1"]
+
+# Print the metrics
+print(Gbmconfmatrix)
+
+cat("Accuracy:", Gbmaccuracy, "\n")
+cat("Recall:", Gbmrecall, "\n")
+cat("Precision:", Gbmprecision, "\n")
+cat("F1 Score:", Gbmf1score, "\n")
+```
+
+### 4.3.5. Neural Network
+
+Import Libraries
+```{r}
+# Load necessary libraries
+library(keras)
+library(tensorflow)
+library(nnet) #function for neural network
+library(caret) #streamlines training and evaluation
+
+# Scale the data
+dl4train <- m4train
+dl4test <- m4test
+```
+
+
+```{r}
+dl4train[-which(names(dl4train) == "Aircompfail")] <- scale(dl4train[-which(names(dl4train) == "Aircompfail")])
+
+dl4test[-which(names(dl4test) == "Aircompfail")] <- scale(dl4test[-which(names(dl4test) == "Aircompfail")])
+
+#FIT NN
+NNmodel <- nnet(Aircompfail~., data = dl4train, size = 5, decay = 0.1, maxit = 200, linout = FALSE)
+
+#Neural Network Predict
+NNpred <- predict(NNmodel, dl4test, type = "raw")
+NNpred
+summary(NNpred)
+```
+
+#### NN Evaluate
+```{r}
+# Convert probabilities to class labels
+NNpredclass <- ifelse(NNpred > 0.5, "1", "0")
+NNpredclass <- as.factor(NNpredclass)
+
+print(paste("Length of predicted classes: ", length(NNpredclass)))
+print(paste("Length of actual classes: ", length(dl4test$Aircompfail)))
+
+# Create a confusion matrix
+NNconfmatrix <- confusionMatrix(NNpredclass, factor(dl4test$Aircompfail))
+
+# Extract recall, precision, and F1 score
+NNaccuracy <- NNconfmatrix$overall['Accuracy']
+NNrecall <- NNconfmatrix$byClass["Recall"]
+NNprecision <- NNconfmatrix$byClass["Precision"]
+NNf1score <- NNconfmatrix$byClass["F1"]
+
+# Print the metrics
+print(NNconfmatrix)
+
+cat("Accuracy:", NNaccuracy, "\n")
+cat("Recall:", NNrecall, "\n")
+cat("Precision:", NNprecision, "\n")
+cat("F1 Score:", NNf1score, "\n")
+```
+
+## 4.4 Model Comparison
+```{r}
+#print accuracy for each model
+Logaccuracy
+Dtaccuracy
+Rfaccuracy
+Gbmaccuracy
+NNaccuracy
+```
+
+```{r}
+# Store all accuracies in a named vector
+accuracies <- c(Logaccuracy, Dtaccuracy, Rfaccuracy, Gbmaccuracy, NNaccuracy)
+names <- c("Logaccuracy", "Dtaccuracy", "Rfaccuracy", "Gbmaccuracy", "NNaccuracy")
+
+# Create a data frame for ggplot
+accuracy_df <- data.frame(Model = names, Accuracy = accuracies)
+
+# Find the highest accuracy
+max_accuracy <- max(accuracies)
+
+# Find which model achieved the highest accuracy
+best_model <- names[which.max(accuracies)]
+
+# Visualize the accuracies using ggplot2
+ggplot(accuracy_df, aes(x = Model, y = Accuracy, fill = Model)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  geom_text(aes(label = round(Accuracy, 2)), vjust = -0.3) +
+  labs(title = "Model Accuracies", y = "Accuracy", x = "Model") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r}
+# Print the highest accuracy and the corresponding model
+cat("The highest accuracy is", max_accuracy, "achieved by", best_model, "\n")
+```
+
+
+
+# 5. Analogue Sensor
+```{r}
+View(Analog)
+str(Analog)
+```
+
+## 5.1 Feature Selection
+```{r}
+# Calculate the correlation matrix
+Analogcorrmatrix <- cor(Analog[, -ncol(Analog)])
+
+# Plot the correlation matrix
+corrplot(Analogcorrmatrix, method = "circle")
+```
+
+```{r}
+# Find highly correlated features (correlation > 0.75)
+AnaloghighlyCorrelated <- findCorrelation(Analogcorrmatrix, cutoff = 0.75)
+
+# Print the indices of highly correlated attributes
+print(AnaloghighlyCorrelated)
+```
+
+```{r}
+# Remove highly correlated features
+Analog <- Analog[, -AnaloghighlyCorrelated]
+
+str(Analog)
+```
+
+## 5.2 Train_Test_Split
+
+Split the dataframe using 80/20 split
+```{r}
+Analogsplit <- sample.split(Analog, SplitRatio = 0.8)
+```
+
+Initiate training set and testing set
+```{r}
+Atrain <- Analog[Analogsplit,]
+Atest <- Analog[!Analogsplit,]
+```
+
+80% to training and 20% to testing dataset
+
+```{r}
+names(Analog)
+```
+
+check for number of rows in each
+```{r}
+nrow(Atrain)
+```
+
+```{r}
+nrow(Atest)
+```
+
+## 5.3 Modelling Techniques
+
+### 5.3.1. Logistic Regression
+```{r}
+#Train the model
+ALogmodel <- glm(Aircompfail~., data = Atrain, family = "binomial")
+
+#Predict the model
+ALogpredict <- predict(ALogmodel, Atest, type = "response")
+ALogpredict
+```
+
+#### Logistic Regression Evaluation
+```{r}
+# Convert probabilities to binary outcomes (assuming 0.5 as threshold)
+ALogpredclass <- ifelse(ALogpredict > 0.5, 1, 0)
+ALogpredclass <- as.factor(ALogpredclass)
+
+summary(ALogpredclass)
+```
+
+```{r}
+# Ensure that the lengths of predclass and testdata match
+print(paste("Length of predicted classes: ", length(ALogpredclass)))
+print(paste("Length of actual classes: ", length(Atest$Aircompfail)))
+
+Alogmatrix <- confusionMatrix(ALogpredclass, (factor(Atest$Aircompfail)))
+Alogmatrix
+
+Alogaccuracy <- Alogmatrix$overall['Accuracy']
+Alogrecall <- Alogmatrix$byClass["Recall"]
+Alogprecision <- Alogmatrix$byClass["Precision"]
+Alogf1score <- Alogmatrix$byClass["F1"]
+
+Alogaccuracy
+Alogrecall
+Alogprecision
+Alogf1score
+```
+
+### 5.3.2. Decision Tree
+```{r}
+# Fit the decision tree model using the training data
+Adtmodel <- rpart(Aircompfail ~ ., data = Atrain, method = "class")
+
+# Plot the decision tree
+rpart.plot(Adtmodel)
+```
+
+Predict the model
+```{r}
+# Predict class labels
+Adtpredict <- predict(Adtmodel, Atest, type = "class")  # Get class labels
+summary(Adtpredict)
+```
+
+#### Decision Tree Evaluation
+```{r}
+# Ensure that the lengths of predclass and testdata match
+print(paste("Length of predicted classes: ", length(Adtpredict)))
+print(paste("Length of actual classes: ", length(Atest$Aircompfail)))
+```
+
+Decision Tree Confusion  matrix
+```{r}
+#Evaluate model performance
+Adtconfmatrix <- confusionMatrix(factor(Adtpredict), factor(Atest$Aircompfail))
+Adtaccuracy <- Adtconfmatrix$overall['Accuracy']
+Adtrecall <- Adtconfmatrix$byClass["Recall"]
+Adtprecision <- Adtconfmatrix$byClass["Precision"]
+Adtf1score <- Adtconfmatrix$byClass["F1"]
+
+Adtconfmatrix
+Adtaccuracy
+Adtrecall
+Adtprecision
+Adtf1score
+```
+
+### 5.3.3. Random forest
+```{r}
+# Train the Random Forest model
+Arfmodel <- ranger(Aircompfail ~ ., data = Atrain, probability = TRUE)
+
+#predict on the test set
+Arfpredict <- predict(Arfmodel, Atest)$predictions
+summary(Arfpredict)
+```
+
+#### Random Forest Evaluation
+```{r}
+# Convert predictions and actual values to factors with the same levels
+Arfpredclass <- ifelse(Arfpredict[,2] > 0.5, "1", "0")
+
+
+print(paste("Length of predicted classes: ", length(Arfpredclass)))
+print(paste("Length of actual classes: ", length(Atest$Aircompfail)))
+
+# Generate the confusion matrix and calculate accuracy
+Arfconfmatrix <- confusionMatrix(as.factor(Arfpredclass), factor(Atest$Aircompfail))
+
+# Extract recall, precision, and F1 score
+Arfaccuracy <- Arfconfmatrix$overall['Accuracy']
+Arfrecall <- Arfconfmatrix$byClass["Recall"]
+Arfprecision <- Arfconfmatrix$byClass["Precision"]
+Arff1score <- Arfconfmatrix$byClass["F1"]
+
+# Print the metrics
+print(Arfconfmatrix)
+
+cat("Accuracy:", Arfaccuracy, "\n")
+cat("Recall:", Arfrecall, "\n")
+cat("Precision:", Arfprecision, "\n")
+cat("F1 Score:", Arff1score, "\n")
+```
+
+
+### 5.3.4. Gradient Boosting Machine
+```{r}
+# Train the GBM model
+Agbmmodel <- gbm(Aircompfail ~ ., data = Atrain,
+                 distribution = "bernoulli", # For binary classification
+                 n.trees = 100,              # Number of trees
+                 interaction.depth = 3,      # Depth of each tree
+                 shrinkage = 0.01,            # Learning rate
+                 cv.folds = 5,               # Number of cross-validation folds
+                 verbose = TRUE)             # Print progress
+
+# Print the summary of the model to get information on the performance
+summary(Agbmmodel)
+str(Agbmmodel)
+
+# Determine the best number of trees using cross-validation results
+Abestntrees <- gbm.perf(Agbmmodel, method = "cv")
+print(paste("Best number of trees:", Abestntrees))
+```
+
+```{r}
+# Make predictions on the test set
+Agbmpredict <- predict(Agbmmodel, newdata = Atest, n.trees = Abestntrees, type = "response")
+summary(Agbmpredict)
+```
+
+#### GBM Evaluate
+```{r}
+# Convert probabilities to class labels
+Agbmpredclass <- ifelse(Agbmpredict > 0.5, "1", "0")
+Agbmpredclass <- as.factor(Agbmpredclass)
+
+print(paste("Length of predicted classes: ", length(Agbmpredclass)))
+print(paste("Length of actual classes: ", length(Atest$Aircompfail)))
+
+# Create a confusion matrix
+Agbmconfmatrix <- confusionMatrix(Agbmpredclass, factor(Atest$Aircompfail))
+
+# Extract recall, precision, and F1 score
+Agbmaccuracy <- Agbmconfmatrix$overall['Accuracy']
+Agbmrecall <- Agbmconfmatrix$byClass["Recall"]
+Agbmprecision <- Agbmconfmatrix$byClass["Precision"]
+Agbmf1score <- Agbmconfmatrix$byClass["F1"]
+
+# Print the metrics
+print(Agbmconfmatrix)
+cat("Accuracy:", Agbmaccuracy, "\n")
+cat("Recall:", Agbmrecall, "\n")
+cat("Precision:", Agbmprecision, "\n")
+cat("F1 Score:", Agbmf1score, "\n")
+```
+
+### 5.3.5. Neural Network
+
+```{r}
+# Create a copy of the data
+dlAtrain <- Atrain
+dlAtest <- Atest
+
+#scale the data
+dlAtrain[-which(names(dlAtrain) == "Aircompfail")] <- scale(dlAtrain[-which(names(dlAtrain) == "Aircompfail")])
+
+dlAtest[-which(names(dlAtest) == "Aircompfail")] <- scale(dlAtest[-which(names(dlAtest) == "Aircompfail")])
+
+#FIT NN
+Annmodel <- nnet(Aircompfail~., data = dlAtrain, size = 5, decay = 0.1, maxit = 200, linout = FALSE)
+
+#Neural Network Predict
+Annpred <- predict(Annmodel, dlAtest, type = "raw")
+Annpred
+summary(Annpred)
+```
+
+#### NN Evaluate
+```{r}
+# Convert probabilities to class labels
+Annpredclass <- ifelse(Annpred > 0.5, "1", "0")
+Annpredclass <- as.factor(Annpredclass)
+
+print(paste("Length of predicted classes: ", length(Annpredclass)))
+print(paste("Length of actual classes: ", length(dlAtest$Aircompfail)))
+
+# Create a confusion matrix
+Annconfmatrix <- confusionMatrix(Annpredclass, factor(dlAtest$Aircompfail))
+
+# Extract recall, precision, and F1 score
+Annaccuracy <- Annconfmatrix$overall['Accuracy']
+Annrecall <- Annconfmatrix$byClass["Recall"]
+Annprecision <- Annconfmatrix$byClass["Precision"]
+Annf1score <- Annconfmatrix$byClass["F1"]
+
+# Print the metrics
+print(Annconfmatrix)
+
+cat("Accuracy:", Annaccuracy, "\n")
+cat("Recall:", Annrecall, "\n")
+cat("Precision:", Annprecision, "\n")
+cat("F1 Score:", Annf1score, "\n")
+```
+
+## 5.4 Model Comparison
+```{r}
+#print accuracy for each model
+Alogaccuracy
+Adtaccuracy
+Arfaccuracy
+Agbmaccuracy
+Annaccuracy
+```
+
+```{r}
+# Store all accuracies in a named vector
+Analog_accuracies <- c(Alogaccuracy, Adtaccuracy, Arfaccuracy, Agbmaccuracy, Annaccuracy)
+Anames <- c("Alogaccuracy", "Adtaccuracy", "Arfaccuracy", "Agbmaccuracy", "Annaccuracy")
+
+# Create a data frame for ggplot
+Analog_df <- data.frame(Model = Anames, Accuracy = Analog_accuracies)
+
+# Find the highest accuracy
+Amax_accuracy <- max(Analog_accuracies)
+
+# Find which model achieved the highest accuracy
+Abest_model <- Anames[which.max(Analog_accuracies)]
+
+# Visualize the accuracies using ggplot2
+ggplot(Analog_df, aes(x = Model, y = Accuracy, fill = Model)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  geom_text(aes(label = round(Accuracy, 2)), vjust = -0.3) +
+  labs(title = "Analog Model Accuracies", y = "Accuracy", x = "Models") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r}
+# Print the highest accuracy and the corresponding model
+cat("The highest accuracy is", Amax_accuracy, "achieved by", Abest_model, "\n")
+```
+
+# 6. Digital Sensors - Modelling 
+```{r}
+View(Digital)
+str(Digital)
+```
+
+## 6.1 Feature Selection
+```{r}
+# Calculate the correlation matrix
+Digitalcorrmatrix <- cor(Digital[, -ncol(Digital)])
+
+# Plot the correlation matrix
+corrplot(Digitalcorrmatrix, method = "circle")
+```
+
+```{r}
+# Find highly correlated features (correlation > 0.75)
+DigitalhighlyCorrelated <- findCorrelation(Digitalcorrmatrix, cutoff = 0.75)
+
+# Print the indices of highly correlated attributes
+print(DigitalhighlyCorrelated)
+```
+
+```{r}
+# Remove highly correlated features
+Digital <- Digital[, -DigitalhighlyCorrelated]
+
+str(Digital)
+```
+
+## 6.2 Train_Test_Split
+
+Split the dataframe using 80/20 split
+```{r}
+Digitalsplit <- sample.split(Digital, SplitRatio = 0.8)
+```
+
+Initiate training set and testing set
+```{r}
+Dtrain <- Digital[Digitalsplit,]
+Dtest <- Digital[!Digitalsplit,]
+```
+
+80% to training and 20% to testing dataset
+
+```{r}
+names(Digital)
+```
+
+check for number of rows in each
+```{r}
+nrow(Dtrain)
+```
+
+```{r}
+nrow(Dtest)
+```
+
+## 6.3 Digital Sensor
+
+### 6.3.1. Logistic Regression
+```{r}
+#Train the model
+DLogmodel <- glm(Aircompfail~., data = Dtrain, family = "binomial")
+
+#Predict the model
+DLogpredict <- predict(DLogmodel, Dtest, type = "response")
+DLogpredict
+```
+
+#### Logistic Regression Evaluation
+```{r}
+# Convert probabilities to binary outcomes (assuming 0.5 as threshold)
+DLogpredclass <- ifelse(DLogpredict > 0.5, 1, 0)
+DLogpredclass <- as.factor(DLogpredclass)
+
+summary(DLogpredclass)
+```
+
+```{r}
+# Ensure that the lengths of predclass and testdata match
+print(paste("Length of predicted classes: ", length(DLogpredclass)))
+print(paste("Length of actual classes: ", length(Dtest$Aircompfail)))
+
+Dlogmatrix <- confusionMatrix(DLogpredclass, (factor(Dtest$Aircompfail)))
+Dlogmatrix
+
+Dlogaccuracy <- Dlogmatrix$overall['Accuracy']
+Dlogrecall <- Dlogmatrix$byClass["Recall"]
+Dlogprecision <- Dlogmatrix$byClass["Precision"]
+Dlogf1score <- Dlogmatrix$byClass["F1"]
+
+Dlogaccuracy
+Dlogrecall
+Dlogprecision
+Dlogf1score
+```
+
+### 6.3.2. Decision Tree
+```{r}
+# Fit the decision tree model using the training data
+Ddtmodel <- rpart(Aircompfail ~ ., data = Dtrain, method = "class")
+
+# Plot the decision tree
+rpart.plot(Ddtmodel)
+
+# Predict class labels
+Ddtpredict <- predict(Ddtmodel, Dtest, type = "class")  # Get class labels
+summary(Ddtpredict)
+```
+
+#### Decision Tree Evaluation
+```{r}
+# Ensure that the lengths of predclass and testdata match
+print(paste("Length of predicted classes: ", length(Ddtpredict)))
+print(paste("Length of actual classes: ", length(Dtest$Aircompfail)))
+```
+
+Decision Tree Confusion  matrix
+```{r}
+#Evaluate model performance
+Ddtconfmatrix <- confusionMatrix(factor(Ddtpredict), factor(Dtest$Aircompfail))
+Ddtaccuracy <- Ddtconfmatrix$overall['Accuracy']
+Ddtrecall <- Ddtconfmatrix$byClass["Recall"]
+Ddtprecision <- Ddtconfmatrix$byClass["Precision"]
+Ddtf1score <- Ddtconfmatrix$byClass["F1"]
+
+Ddtconfmatrix
+Ddtaccuracy
+Ddtrecall
+Ddtprecision
+Ddtf1score
+```
+
+### 6.3.3. Random forest
+```{r}
+# Train the Random Forest model
+Drfmodel <- ranger(Aircompfail ~ ., data = Dtrain, probability = TRUE)
+
+#predict on the test set
+Drfpredict <- predict(Drfmodel, Dtest)$predictions
+summary(Drfpredict)
+```
+
+#### Random Forest Evaluation
+```{r}
+# Convert predictions and actual values to factors with the same levels
+Drfpredclass <- ifelse(Drfpredict[,2] > 0.5, "1", "0")
+
+
+print(paste("Length of predicted classes: ", length(Drfpredclass)))
+print(paste("Length of actual classes: ", length(Dtest$Aircompfail)))
+
+# Generate the confusion matrix and calculate accuracy
+Drfconfmatrix <- confusionMatrix(as.factor(Drfpredclass), factor(Dtest$Aircompfail))
+
+# Extract recall, precision, and F1 score
+Drfaccuracy <- Drfconfmatrix$overall['Accuracy']
+Drfrecall <- Drfconfmatrix$byClass["Recall"]
+Drfprecision <- Drfconfmatrix$byClass["Precision"]
+Drff1score <- Drfconfmatrix$byClass["F1"]
+
+# Print the metrics
+print(Drfconfmatrix)
+
+cat("Accuracy:", Drfaccuracy, "\n")
+cat("Recall:", Drfrecall, "\n")
+cat("Precision:", Drfprecision, "\n")
+cat("F1 Score:", Drff1score, "\n")
+```
+
+
+### 6.3.4. Gradient Boosting Machine
+```{r}
+# Train the GBM model
+Dgbmmodel <- gbm(Aircompfail ~ ., data = Dtrain,
+                 distribution = "bernoulli", # For binary classification
+                 n.trees = 100,              # Number of trees
+                 interaction.depth = 3,      # Depth of each tree
+                 shrinkage = 0.01,            # Learning rate
+                 cv.folds = 5,               # Number of cross-validation folds
+                 verbose = TRUE)             # Print progress
+
+# Print the summary of the model to get information on the performance
+summary(Dgbmmodel)
+str(Dgbmmodel)
+
+# Determine the best number of trees using cross-validation results
+Dbestntrees <- gbm.perf(Dgbmmodel, method = "cv")
+print(paste("Best number of trees:", Dbestntrees))
+```
+
+```{r}
+# Make predictions on the test set
+Dgbmpredict <- predict(Dgbmmodel, newdata = Dtest, n.trees = Dbestntrees, type = "response")
+summary(Dgbmpredict)
+```
+
+#### GBM Evaluate
+```{r}
+# Convert probabilities to class labels
+Dgbmpredclass <- ifelse(Dgbmpredict > 0.5, "1", "0")
+Dgbmpredclass <- as.factor(Dgbmpredclass)
+
+print(paste("Length of predicted classes: ", length(Dgbmpredclass)))
+print(paste("Length of actual classes: ", length(Dtest$Aircompfail)))
+
+# Create a confusion matrix
+Dgbmconfmatrix <- confusionMatrix(Dgbmpredclass, factor(Dtest$Aircompfail))
+
+# Extract recall, precision, and F1 score
+Dgbmaccuracy <- Dgbmconfmatrix$overall['Accuracy']
+Dgbmrecall <- Dgbmconfmatrix$byClass["Recall"]
+Dgbmprecision <- Dgbmconfmatrix$byClass["Precision"]
+Dgbmf1score <- Dgbmconfmatrix$byClass["F1"]
+
+# Print the metrics
+print(Dgbmconfmatrix)
+cat("Accuracy:", Dgbmaccuracy, "\n")
+cat("Recall:", Dgbmrecall, "\n")
+cat("Precision:", Dgbmprecision, "\n")
+cat("F1 Score:", Dgbmf1score, "\n")
+```
+
+### 6.3.5. Neural Network
+```{r}
+# Copy the data
+dlDtrain <- Dtrain
+dlDtest <- Dtest
+
+#scale the data
+dlDtrain[-which(names(dlDtrain) == "Aircompfail")] <- scale(dlDtrain[-which(names(dlDtrain) == "Aircompfail")])
+
+dlDtest[-which(names(dlDtest) == "Aircompfail")] <- scale(dlDtest[-which(names(dlDtest) == "Aircompfail")])
+
+#FIT NN
+Dnnmodel <- nnet(Aircompfail~., data = dlDtrain, size = 5, decay = 0.1, maxit = 200, linout = FALSE)
+
+#Neural Network Predict
+Dnnpred <- predict(Dnnmodel, dlDtest, type = "raw")
+Dnnpred
+summary(Dnnpred)
+```
+
+#### NN Evaluate
+```{r}
+# Convert probabilities to class labels
+Dnnpredclass <- ifelse(Dnnpred > 0.5, "1", "0")
+Dnnpredclass <- as.factor(Dnnpredclass)
+
+print(paste("Length of predicted classes: ", length(Dnnpredclass)))
+print(paste("Length of actual classes: ", length(dlDtest$Aircompfail)))
+
+# Create a confusion matrix
+Dnnconfmatrix <- confusionMatrix(Dnnpredclass, factor(dlDtest$Aircompfail))
+
+# Extract recall, precision, and F1 score
+Dnnaccuracy <- Dnnconfmatrix$overall['Accuracy']
+Dnnrecall <- Dnnconfmatrix$byClass["Recall"]
+Dnnprecision <- Dnnconfmatrix$byClass["Precision"]
+Dnnf1score <- Dnnconfmatrix$byClass["F1"]
+
+# Print the metrics
+print(Dnnconfmatrix)
+
+cat("Accuracy:", Dnnaccuracy, "\n")
+cat("Recall:", Dnnrecall, "\n")
+cat("Precision:", Dnnprecision, "\n")
+cat("F1 Score:", Dnnf1score, "\n")
+```
+
+## 6.4 Model Comparison
+```{r}
+#print accuracy for each model
+Dlogaccuracy
+Ddtaccuracy
+Drfaccuracy
+Dgbmaccuracy
+Dnnaccuracy
+```
+
+```{r}
+# Store all accuracies in a named vector
+Digital_accuracies <- c(Dlogaccuracy, Ddtaccuracy, Drfaccuracy, Dgbmaccuracy, Dnnaccuracy)
+Dnames <- c("Dlogaccuracy", "Ddtaccuracy", "Drfaccuracy", "Dgbmaccuracy", "Dnnaccuracy")
+
+# Create a data frame for ggplot
+Digital_df <- data.frame(Model = Dnames, Accuracy = Digital_accuracies)
+
+# Find the highest accuracy
+Dmax_accuracy <- max(Digital_accuracies)
+
+# Find which model achieved the highest accuracy
+Dbest_model <- Dnames[which.max(Digital_accuracies)]
+
+# Visualize the accuracies using ggplot2
+ggplot(Digital_df, aes(x = Model, y = Accuracy, fill = Model)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  geom_text(aes(label = round(Accuracy, 2)), vjust = -0.3) +
+  labs(title = "Digital Model Accuracies", y = "Accuracy", x = "Models") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r}
+# Print the highest accuracy and the corresponding model
+cat("The highest accuracy is", Dmax_accuracy, "achieved by", Dbest_model, "\n")
+```
+
+# 7. Evaluation
+```{r}
+
+```
+
+```{r}
+# Create a data frame with the accuracies
+Evaluationdf <- data.frame(
+  Techniques = c("Logaccuracy", "Dtaccuracy", "Rfaccuracy", "Gbmaccuracy", "NNaccuracy",
+            "Alogaccuracy", "Adtaccuracy", "Arfaccuracy", "Agbmaccuracy", "Annaccuracy",
+            "Dlogaccuracy", "Ddtaccuracy", "Drfaccuracy", "Dgbmaccuracy", "Dnnaccuracy"),
+  Accuracy = c(Logaccuracy, Dtaccuracy, Rfaccuracy, Gbmaccuracy, NNaccuracy,
+               Alogaccuracy, Adtaccuracy, Arfaccuracy, Agbmaccuracy, Annaccuracy,
+               Dlogaccuracy, Ddtaccuracy, Drfaccuracy, Dgbmaccuracy, Dnnaccuracy),
+  Precision = c(Logprecision, Dtprecision, Rfprecision, Gbmprecision, NNprecision,
+                Alogprecision, Adtprecision, Arfprecision, Agbmprecision, Annprecision,
+                Dlogprecision, Ddtprecision, Drfprecision, Dgbmprecision, Dnnprecision),
+  Recall = c(Logrecall, Dtrecall, Rfrecall, Gbmrecall, NNrecall,
+             Alogrecall, Adtrecall, Arfrecall, Agbmrecall, Annrecall,
+             Dlogrecall, Ddtrecall, Drfrecall, Dgbmrecall, Dnnrecall),
+  F1_score = c(Logf1score, Dtf1score, Rff1score, Gbmf1score, NNf1score,
+               Alogf1score, Adtf1score, Arff1score, Agbmf1score, Annf1score,
+               Dlogf1score, Ddtf1score, Drff1score, Dgbmf1score, Dnnf1score)
+)
+
+# Print the accuracy table
+Evaluationdf
+```
+
+```{r}
+library(reshape2)
+
+# Find the highest accuracy and the corresponding model
+max_eval <- max(Evaluationdf$Accuracy)
+evalbestmodel <- Evaluationdf$Techniques[which.max(Evaluationdf$Accuracy)]
+
+# Convert the data from wide to long format for easier plotting
+Evaluationdf_long <- melt(Evaluationdf, id.vars = "Techniques", 
+                          variable.name = "Metric", value.name = "Value")
+
+# Plotting the metrics for each technique
+ggplot(Evaluationdf_long, aes(x = Techniques, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_text(aes(label = round(Value, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 3)
+  labs(title = "Comparison of Metrics Across Techniques",
+       x = "Techniques",
+       y = "Value") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_brewer(palette = "Set3")  # Use a color palette for differentiation
+```
+
+```{r}
+# Visualize the accuracies using ggplot2
+ggplot(Evaluationdf, aes(y = Techniques, x = Accuracy, fill = Techniques)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  geom_text(aes(label = round(Accuracy, 2)), vjust = -0.3) +
+  labs(title = "Model Accuracies", y = "Accuracy", x = "Tecniques") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  coord_flip() # Flip the coordinates for better readability if there are many models
+```
+
+```{r}
+# Print the highest accuracy and the corresponding model
+cat("The highest accuracy is", max_eval, "achieved by", evalbestmodel, "\n")
+```
+
+# 8. Analogue Hybrid Model
+```{r}
+length(Annpredclass)
+length(Arfpredclass)
+
+Arfpredict_pos_class <- Arfpredict[, 2]
+length(Arfpredict_pos_class)
+
+class(Arfpredict_pos_class)
+class(Annpredclass)
+
+#Combined model using Random Forest and Neural Network by averaging of the probabilities
+combined_predictions <- (Arfpredict_pos_class + (as.numeric(as.character(Annpredclass)))) / 2  
+
+# Step 5: Convert Combined Predictions to Class Labels
+combined_predictions_class <- ifelse(combined_predictions > 0.5, 1, 0)
+length(combined_predictions_class)
+```
+
+## Analogue Hybrid Evaluate
+```{r}
+length(combined_predictions_class)
+length(dlAtest$Aircompfail)
+
+# Ensure that both vectors are factors
+combined_predictions_factor <- factor(combined_predictions_class, levels = levels(as.factor(Atest$Aircompfail)))
+actual_factor <- factor(Atest$Aircompfail)
+
+
+# Calculate performance metrics
+Ahybridconf_matrix <- confusionMatrix(combined_predictions_factor, actual_factor)
+print(Ahybridconf_matrix)
+```
+
+```{r}
+# Extract recall, precision, and F1 score
+Ahyaccuracy <- Ahybridconf_matrix$overall['Accuracy']
+Ahyrecall <- Ahybridconf_matrix$byClass["Recall"]
+Ahyprecision <- Ahybridconf_matrix$byClass["Precision"]
+Ahyf1score <- Ahybridconf_matrix$byClass["F1"]
+
+Ahyaccuracy
+Ahyrecall
+Ahyprecision
+Ahyf1score
+```
+
+```{r}
+# Save Metro5 as a CSV file
+#write.csv(Metro5, "Metro5.csv", row.names = FALSE)
+```
+
+
+
